@@ -4,6 +4,8 @@
 	import TaskCard from '$lib/components/task-board/TaskCard.svelte';
 	import type { Task } from '$lib/types/tasks';
 
+	let filterText = $state('');
+
 	let tasks: Task[] = $state([
 		{
 			id: '1',
@@ -67,8 +69,15 @@
 		}
 	]);
 
+	let filteredTasks = $derived(
+		tasks.filter(
+			(task) =>
+				task.title.toLowerCase().includes(filterText.toLowerCase()) ||
+				task.description.toLowerCase().includes(filterText.toLowerCase())
+		)
+	);
 	let sortedTasks = $derived(
-		tasks.toSorted((a, b) => a.updatedAt.getTime() - b.updatedAt.getTime())
+		filteredTasks.toSorted((a, b) => a.updatedAt.getTime() - b.updatedAt.getTime())
 	);
 	let openTodos = $derived(sortedTasks.filter((task) => task.status === 'todo'));
 	let inProgressTodos = $derived(sortedTasks.filter((task) => task.status === 'in-progress'));
@@ -100,7 +109,7 @@
 	<header class="board-header">
 		<h1>Task Board</h1>
 		<form role="search">
-			<input name="filter" type="search" placeholder="Filter" />
+			<input name="filter" type="search" placeholder="Filter" bind:value={filterText} />
 		</form>
 	</header>
 	<div class="grid">
