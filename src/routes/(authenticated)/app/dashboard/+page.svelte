@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { Circle, CircleCheck, LoaderCircle } from 'lucide-svelte';
+	import { flip } from 'svelte/animate';
+	import { send, receive } from '$lib/utils/animation';
 
 	type Tag = {
 		id: string;
@@ -103,6 +105,7 @@
 		if (!task) return;
 
 		task.status = event.currentTarget!.dataset.status!;
+		task.updatedAt = new Date();
 	}
 </script>
 
@@ -140,8 +143,10 @@
 				<strong role="heading" aria-level="2">To Do</strong>
 			</header>
 
-			{#each openTodos as task}
-				{@render taskCard(task)}
+			{#each openTodos as task (task.id)}
+				<div animate:flip in:send={{ key: task.id }} out:receive={{ key: task.id }}>
+					{@render taskCard(task)}
+				</div>
 			{/each}
 		</article>
 		<article class="status-column" data-status="in-progress" {ondragover} {ondrop}>
@@ -149,8 +154,10 @@
 				<strong role="heading" aria-level="2">In Progress</strong>
 			</header>
 
-			{#each inProgressTodos as task}
-				{@render taskCard(task)}
+			{#each inProgressTodos as task (task.id)}
+				<div animate:flip in:send={{ key: task.id }} out:receive={{ key: task.id }}>
+					{@render taskCard(task)}
+				</div>
 			{/each}
 		</article>
 		<article class="status-column" data-status="done" {ondragover} {ondrop}>
@@ -158,8 +165,10 @@
 				<strong role="heading" aria-level="2">Done</strong>
 			</header>
 
-			{#each doneTodos as task}
-				{@render taskCard(task)}
+			{#each doneTodos as task (task.id)}
+				<div animate:flip in:send={{ key: task.id }} out:receive={{ key: task.id }}>
+					{@render taskCard(task)}
+				</div>
 			{/each}
 		</article>
 	</div>
