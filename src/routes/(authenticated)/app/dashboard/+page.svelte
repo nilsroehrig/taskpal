@@ -1,21 +1,8 @@
 <script lang="ts">
-	import { Circle, CircleCheck, LoaderCircle } from 'lucide-svelte';
 	import { flip } from 'svelte/animate';
 	import { send, receive } from '$lib/utils/animation';
-
-	type Tag = {
-		id: string;
-		name: string;
-	};
-
-	type Task = {
-		id: string;
-		title: string;
-		description: string;
-		status: string;
-		tags: Tag[];
-		updatedAt: Date;
-	};
+	import TaskCard from '$lib/components/task-board/TaskCard.svelte';
+	import type { Task } from '$lib/types/tasks';
 
 	let tasks: Task[] = $state([
 		{
@@ -109,27 +96,6 @@
 	}
 </script>
 
-{#snippet taskCard(task: Task)}
-	<article class="card" id={task.id} draggable="true" {ondragstart}>
-		<header>
-			<strong role="heading" aria-level="3">{task.title}</strong>
-			{#if task.status === 'todo'}
-				<Circle />
-			{:else if task.status === 'in-progress'}
-				<LoaderCircle class="pico-color-blue" />
-			{:else}
-				<CircleCheck class="pico-color-green" />
-			{/if}
-		</header>
-		<p>{task.description}</p>
-		<ul class="inline-list">
-			{#each task.tags as tag}
-				<li class="badge badge-small pico-background-sand">{tag.name}</li>
-			{/each}
-		</ul>
-	</article>
-{/snippet}
-
 <article class="board">
 	<header class="board-header">
 		<h1>Task Board</h1>
@@ -145,7 +111,7 @@
 
 			{#each openTodos as task (task.id)}
 				<div animate:flip in:send={{ key: task.id }} out:receive={{ key: task.id }}>
-					{@render taskCard(task)}
+					<TaskCard draggable="true" {task} {ondragstart} />
 				</div>
 			{/each}
 		</article>
@@ -156,7 +122,7 @@
 
 			{#each inProgressTodos as task (task.id)}
 				<div animate:flip in:send={{ key: task.id }} out:receive={{ key: task.id }}>
-					{@render taskCard(task)}
+					<TaskCard draggable="true" {task} {ondragstart} />
 				</div>
 			{/each}
 		</article>
@@ -167,7 +133,7 @@
 
 			{#each doneTodos as task (task.id)}
 				<div animate:flip in:send={{ key: task.id }} out:receive={{ key: task.id }}>
-					{@render taskCard(task)}
+					<TaskCard draggable="true" {task} {ondragstart} />
 				</div>
 			{/each}
 		</article>
@@ -191,51 +157,6 @@
 
 		.grid > * {
 			margin-bottom: 0;
-		}
-	}
-
-	.inline-list {
-		display: flex;
-		flex-wrap: wrap;
-		gap: calc(var(--pico-spacing) / 2);
-		padding: 0;
-
-		li {
-			list-style: none;
-			margin: 0;
-		}
-	}
-
-	.badge {
-		padding: 0.25rem 0.5rem;
-		border-radius: 0.25rem;
-		font-weight: 500;
-	}
-
-	.badge-small {
-		padding: 0.125rem 0.25rem;
-		font-size: smaller;
-	}
-
-	.card {
-		font-size: smaller;
-
-		> :last-child {
-			margin-bottom: 0;
-		}
-
-		header {
-			display: flex;
-			justify-content: space-between;
-			align-items: center;
-		}
-
-		p {
-			height: 2lh;
-			display: -webkit-box;
-			-webkit-box-orient: vertical;
-			-webkit-line-clamp: 2;
-			overflow: hidden;
 		}
 	}
 
