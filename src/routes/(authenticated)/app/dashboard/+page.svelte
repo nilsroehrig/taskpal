@@ -84,10 +84,30 @@
 	let openTodos = $derived(sortedTasks.filter((task) => task.status === 'todo'));
 	let inProgressTodos = $derived(sortedTasks.filter((task) => task.status === 'in-progress'));
 	let doneTodos = $derived(sortedTasks.filter((task) => task.status === 'done'));
+
+	function ondragstart(event: DragEvent) {
+		event.dataTransfer!.setData('text/plain', event.target!.id);
+	}
+
+	function ondragover(event: DragEvent) {
+		event.preventDefault();
+		event.dataTransfer!.dropEffect = 'move';
+	}
+
+	function ondrop(event: DragEvent) {
+		event.preventDefault();
+		const id = event.dataTransfer!.getData('text/plain');
+
+		const task = tasks.find((task) => task.id === id);
+
+		if (!task) return;
+
+		task.status = event.currentTarget!.dataset.status!;
+	}
 </script>
 
 {#snippet taskCard(task: Task)}
-	<article class="card" id={task.id}>
+	<article class="card" id={task.id} draggable="true" {ondragstart}>
 		<header>
 			<strong role="heading" aria-level="3">{task.title}</strong>
 			{#if task.status === 'todo'}
@@ -115,7 +135,7 @@
 		</form>
 	</header>
 	<div class="grid">
-		<article class="status-column">
+		<article class="status-column" data-status="todo" {ondragover} {ondrop}>
 			<header>
 				<strong role="heading" aria-level="2">To Do</strong>
 			</header>
@@ -124,7 +144,7 @@
 				{@render taskCard(task)}
 			{/each}
 		</article>
-		<article class="status-column">
+		<article class="status-column" data-status="in-progress" {ondragover} {ondrop}>
 			<header>
 				<strong role="heading" aria-level="2">In Progress</strong>
 			</header>
@@ -133,7 +153,7 @@
 				{@render taskCard(task)}
 			{/each}
 		</article>
-		<article class="status-column">
+		<article class="status-column" data-status="done" {ondragover} {ondrop}>
 			<header>
 				<strong role="heading" aria-level="2">Done</strong>
 			</header>
