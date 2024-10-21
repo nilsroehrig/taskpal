@@ -3,6 +3,7 @@
 	import { send, receive } from '$lib/utils/animation';
 	import TaskCard from '$lib/components/task-board/TaskCard.svelte';
 	import type { Task } from '$lib/types/tasks';
+	import StatusColumn from '$lib/components/task-board/StatusColumn.svelte';
 
 	let filterText = $state('');
 
@@ -113,39 +114,27 @@
 		</form>
 	</header>
 	<div class="grid">
-		<article class="status-column" data-status="todo" {ondragover} {ondrop}>
-			<header>
-				<strong role="heading" aria-level="2">To Do</strong>
-			</header>
-
+		<StatusColumn status="todo" {ondragover} {ondrop}>
 			{#each openTodos as task (task.id)}
 				<div animate:flip in:send={{ key: task.id }} out:receive={{ key: task.id }}>
 					<TaskCard draggable="true" {task} {ondragstart} />
 				</div>
 			{/each}
-		</article>
-		<article class="status-column" data-status="in-progress" {ondragover} {ondrop}>
-			<header>
-				<strong role="heading" aria-level="2">In Progress</strong>
-			</header>
-
+		</StatusColumn>
+		<StatusColumn status="in-progress" {ondragover} {ondrop}>
 			{#each inProgressTodos as task (task.id)}
 				<div animate:flip in:send={{ key: task.id }} out:receive={{ key: task.id }}>
 					<TaskCard draggable="true" {task} {ondragstart} />
 				</div>
 			{/each}
-		</article>
-		<article class="status-column" data-status="done" {ondragover} {ondrop}>
-			<header>
-				<strong role="heading" aria-level="2">Done</strong>
-			</header>
-
+		</StatusColumn>
+		<StatusColumn status="done" {ondragover} {ondrop}>
 			{#each doneTodos as task (task.id)}
 				<div animate:flip in:send={{ key: task.id }} out:receive={{ key: task.id }}>
 					<TaskCard draggable="true" {task} {ondragstart} />
 				</div>
 			{/each}
-		</article>
+		</StatusColumn>
 	</div>
 </article>
 
@@ -165,14 +154,6 @@
 		}
 
 		.grid > * {
-			margin-bottom: 0;
-		}
-	}
-
-	.status-column {
-		background-color: var(--pico-background-color);
-
-		> :last-child {
 			margin-bottom: 0;
 		}
 	}
