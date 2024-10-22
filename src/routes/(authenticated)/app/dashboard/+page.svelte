@@ -5,4 +5,4 @@
 	let tasks = $state([...data.board!.tasks]);
 </script>
 
-<Board {tasks} title={data.board!.title} />
+<Board {tasks} title={data.board!.title} boardId={data.board!.id} />

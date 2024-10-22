@@ -5,13 +5,15 @@
 	import type { Task } from '$lib/types/tasks';
 	import StatusColumn from '$lib/components/task-board/StatusColumn.svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
+	import { Plus } from 'lucide-svelte';
 
 	type BoardProps = HTMLAttributes<HTMLElement> & {
 		title?: string;
 		tasks: Task[];
+		boardId: string;
 	};
 
-	let { tasks, title = 'Task Board', ...restProps }: BoardProps = $props();
+	let { boardId, tasks, title = 'Task Board', ...restProps }: BoardProps = $props();
 
 	let filterText = $state('');
 
@@ -81,9 +83,10 @@
 <article class="board" {...restProps}>
 	<header class="board-header">
 		<h1>{title}</h1>
-		<form role="search">
+		<div class="board-actions">
 			<input name="filter" type="search" placeholder="Filter" bind:value={filterText} />
-		</form>
+			<a href="/app/boards/{boardId}/tasks/add" role="button"><Plus /> Add Todo</a>
+		</div>
 	</header>
 	<div class="grid">
 		<StatusColumn status="todo" {ondragover} {ondrop}>
@@ -116,8 +119,8 @@
 		max-width: calc(100% - var(--pico-spacing) * 6);
 
 		header {
-			display: grid;
-			grid-template-columns: 2fr 1fr;
+			display: flex;
+			justify-content: space-between;
 			align-items: center;
 
 			> * {
@@ -127,6 +130,21 @@
 
 		.grid > * {
 			margin-bottom: 0;
+		}
+	}
+
+	.board-actions {
+		display: flex;
+		gap: 1rem;
+
+		input {
+			margin: 0;
+		}
+
+		a {
+			white-space: nowrap;
+			display: flex;
+			align-items: center;
 		}
 	}
 </style>
