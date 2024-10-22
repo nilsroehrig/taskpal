@@ -8,8 +8,34 @@ generator client {
   previewFeatures = ["driverAdapters"]
 }
 
-// model Task {}
+model Task {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  status      String
+  createdAt   DateTime @default(now())
+  modifiedAt  DateTime @default(now()) @updatedAt
+  boardId     String
 
-// model Tag {}
+  tags  Tag[]
+  board Board @relation(fields: [boardId], references: [id])
+}
 
-// model Board {}
+model Tag {
+  id         String   @id @default(cuid())
+  name       String   @unique
+  color      String
+  createdAt  DateTime @default(now())
+  modifiedAt DateTime @default(now()) @updatedAt
+
+  tasks Task[]
+}
+
+model Board {
+  id         String   @id @default(cuid())
+  title      String
+  createdAt  DateTime @default(now())
+  modifiedAt DateTime @default(now()) @updatedAt
+
+  tasks Task[]
+}
