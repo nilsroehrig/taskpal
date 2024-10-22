@@ -43,6 +43,19 @@ have some dummy data in your database and you can start with the exercises.
 1. Add an endpoint to remove a task. It should be accessible right from the task card.
 2. Add a page with form and action to edit a task. It should be linked right from the task card.
 
+## Hands-On Exercises for Part III
+
+First, migrate the database again and regenerate the prisma client.
+
+```bash
+npx wrangler d1 migrations apply DB --local
+npx prisma generate
+```
+
+1. Add a page where registered Taskpal users can log in.
+2. Make sure, that only authenticated users can access routes at the /api or /app paths
+3. Add a login form action to end the session
+
 ## Developing
 
 ```bash
