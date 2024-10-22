@@ -5,7 +5,7 @@
 	import type { Task } from '$lib/types/tasks';
 	import StatusColumn from '$lib/components/task-board/StatusColumn.svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
-	import { Plus } from 'lucide-svelte';
+	import { LogOut, Plus } from 'lucide-svelte';
 
 	type BoardProps = HTMLAttributes<HTMLElement> & {
 		title?: string;
@@ -86,6 +86,9 @@
 		<div class="board-actions">
 			<input name="filter" type="search" placeholder="Filter" bind:value={filterText} />
 			<a href="/app/boards/{boardId}/tasks/add" role="button"><Plus /> Add Todo</a>
+			<form action="/app/logout" method="post">
+				<button class="logout" data-tooltip="Log out"><LogOut /></button>
+			</form>
 		</div>
 	</header>
 	<div class="grid">
