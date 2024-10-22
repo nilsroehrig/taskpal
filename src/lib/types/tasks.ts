@@ -9,5 +9,5 @@ export type Task = {
 	description: string;
 	status: string;
 	tags: Tag[];
-	updatedAt: Date;
+	modifiedAt: Date;
 };

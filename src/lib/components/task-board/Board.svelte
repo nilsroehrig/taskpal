@@ -24,7 +24,7 @@
 	);
 
 	let sortedTasks = $derived(
-		filteredTasks.toSorted((a, b) => a.updatedAt.getTime() - b.updatedAt.getTime())
+		filteredTasks.toSorted((a, b) => a.modifiedAt.getTime() - b.modifiedAt.getTime())
 	);
 
 	let openTodos = $derived(sortedTasks.filter((task) => task.status === 'todo'));
@@ -41,7 +41,7 @@
 		event.dataTransfer!.dropEffect = 'move';
 	}
 
-	function ondrop(event: DragEvent) {
+	async function ondrop(event: DragEvent) {
 		event.preventDefault();
 		const id = event.dataTransfer!.getData('text/plain');
 
@@ -49,8 +49,32 @@
 
 		if (!task) return;
 
+		const originalStatus = task.status;
+		const originalModifiedAt = task.modifiedAt;
+
 		task.status = event.currentTarget!.dataset.status!;
-		task.updatedAt = new Date();
+		task.modifiedAt = new Date();
+
+		await fetch(`/api/tasks/${task.id}/set-status`, {
+			method: 'PATCH',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({
+				status: task.status
+			})
+		}).then(
+			(response) => {
+				if (!response.ok) {
+					task.status = originalStatus;
+					task.modifiedAt = originalModifiedAt;
+				}
+			},
+			() => {
+				task.status = originalStatus;
+				task.modifiedAt = originalModifiedAt;
+			}
+		);
 	}
 </script>
 
