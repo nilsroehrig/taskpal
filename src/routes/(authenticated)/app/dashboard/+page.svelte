@@ -3,6 +3,10 @@
 
 	let { data } = $props();
 	let tasks = $state([...data.board!.tasks]);
+
+	$effect(() => {
+		tasks = [...data.board!.tasks];
+	});
 </script>
 
 <Board {tasks} title={data.board!.title} boardId={data.board!.id} />
