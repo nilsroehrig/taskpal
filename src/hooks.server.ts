@@ -2,6 +2,8 @@ import type { Handle } from '@sveltejs/kit';
 import { PrismaD1 } from '@prisma/adapter-d1';
 import { PrismaClient } from '@prisma/client';
 import { sequence } from '@sveltejs/kit/hooks';
+import { dev } from '$app/environment';
+import { createAuth, sessionCookieName } from '$lib/server/auth';
 
 const addPrisma: Handle = async ({ event, resolve }) => {
 	const adapter = new PrismaD1(event.platform!.env.DB);
@@ -10,4 +12,37 @@ const addPrisma: Handle = async ({ event, resolve }) => {
 	return resolve(event);
 };
 
-export const handle = sequence(addPrisma);
+const addAuth: Handle = async ({ event, resolve }) => {
+	const auth = createAuth(event.locals.db);
+	event.locals.auth = auth;
+	return resolve(event);
+};
+
+const handleAuth: Handle = async ({ event, resolve }) => {
+	const sessionId = event.cookies.get(sessionCookieName);
+	if (!sessionId) {
+		event.locals.user = null;
+		event.locals.session = null;
+		return resolve(event);
+	}
+
+	const { session, user } = await event.locals.auth.validateSession(sessionId);
+	if (session) {
+		event.cookies.set(sessionCookieName, session.id, {
+			path: '/',
+			sameSite: 'lax',
+			httpOnly: true,
+			expires: session.expiresAt,
+			secure: !dev
+		});
+	} else {
+		event.cookies.delete(sessionCookieName, { path: '/' });
+	}
+
+	event.locals.user = user;
+	event.locals.session = session;
+
+	return resolve(event);
+};
+
+export const handle = sequence(addPrisma, addAuth, handleAuth);
