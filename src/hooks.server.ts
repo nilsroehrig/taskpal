@@ -1,4 +1,4 @@
-import type { Handle } from '@sveltejs/kit';
+import { type Handle, redirect } from '@sveltejs/kit';
 import { PrismaD1 } from '@prisma/adapter-d1';
 import { PrismaClient } from '@prisma/client';
 import { sequence } from '@sveltejs/kit/hooks';
@@ -45,4 +45,18 @@ const handleAuth: Handle = async ({ event, resolve }) => {
 	return resolve(event);
 };
 
-export const handle = sequence(addPrisma, addAuth, handleAuth);
+const authenticatedPaths = new Set(['/app', '/api']);
+
+const authorize: Handle = async ({ event, resolve }) => {
+	for (const path of authenticatedPaths) {
+		if (event.url.pathname.startsWith(path)) {
+			if (!event.locals.user) {
+				return redirect(302, '/login');
+			}
+		}
+	}
+
+	return resolve(event);
+};
+
+export const handle = sequence(addPrisma, addAuth, handleAuth, authorize);
