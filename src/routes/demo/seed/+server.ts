@@ -63,7 +63,7 @@ export async function GET({ locals }) {
 	await locals.db.board.create({
 		data: {
 			title: boardTitle,
-			Tasks: {
+			tasks: {
 				create: items.map((item) => {
 					return {
 						...omit(item, 'tags'),
